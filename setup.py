@@ -253,20 +253,18 @@ def get_extensions():
                 "-Xcompiler",
                 "/Zc:preprocessor",
             ]
-        extra_compile_args["nvcc"] = nvcc_flags
 
-        ext_modules += get_flash_attention_extensions(
-            cuda_version=cuda_version, extra_compile_args=extra_compile_args
-        )
-
-        # NOTE: This should not be applied to Flash-Attention
-        # see https://github.com/Dao-AILab/flash-attention/issues/359
-        extra_compile_args["nvcc"] += [
+        nvcc_flags += [
             # Workaround for a regression with nvcc > 11.6
             # See https://github.com/facebookresearch/xformers/issues/712
             "--ptxas-options=-O2",
             "--ptxas-options=-allow-expensive-optimizations=true",
         ]
+        extra_compile_args["nvcc"] = nvcc_flags
+
+        ext_modules += get_flash_attention_extensions(
+            cuda_version=cuda_version, extra_compile_args=extra_compile_args
+        )
 
     ext_modules.append(
         extension(
